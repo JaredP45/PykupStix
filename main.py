@@ -58,12 +58,17 @@ def get_sticks_to_take(currentPlayer: int=None, numOfSticks: int=None) -> int:
     isWithinSelection = False
 
     while not isWithinSelection:
-        playerSticks = int(input("Select a number of sticks between 1-3 >> "))
-        if 3 >= playerSticks >= 1:
-            isWithinSelection = True
-        else:
-            print("Your selection must be between 1 and 3")
-    print(playerSticks)
+        try:
+            playerSticks = int(input("Select a number of sticks between 1-3 >> "))
+            if 3 >= playerSticks >= 1:
+                isWithinSelection = True
+            else:
+                print("Your selection must be between 1 and 3")
+                continue
+        except (ValueError, TypeError):
+            print("You must enter numerical values")
+            continue
+    return playerSticks
 
 
 def display_summary(
@@ -85,7 +90,7 @@ def display_summary(
     Returns:
         None
     """
-    print("Player {0} took {1}, pictsie shenanigans added {2} back, leaving {3}".format(
+    print("Player {0} took {1}, pictsie shenanigans added {2} back, leaving {3} sticks".format(
         currentPlayer,
         playersNumOfSticks,
         addedNumOfSticks,
@@ -96,8 +101,23 @@ def main():
     """
     Main logic of the program
     """
-    player1 = 1
-    player2 = 0
     baseNumofSticksOnBoard = 20
+    player_switch = {True: 1, False: 2}
+    player_state = True
+
+    while baseNumofSticksOnBoard >= 1:
+        current_player = player_switch[player_state]
+        display_board(baseNumofSticksOnBoard)
+        selectedSticks = get_sticks_to_take()
+        baseNumofSticksOnBoard -= selectedSticks
+        display_summary(
+            currentPlayer=current_player,
+            playersNumOfSticks=selectedSticks,
+            addedNumOfSticks=not_quite_right(baseNumofSticksOnBoard),
+            remainingNumOfSticks=baseNumofSticksOnBoard
+        )
+        player_state = not player_state
+    else:
+        print("Sorry, player {} lost".format(current_player))
 
 main()
